@@ -69,6 +69,8 @@ class TsuguClient:
                     if isinstance(payload, dict) and payload.get("data"):
                         raise TsuguClientError(str(payload["data"]))
                     raise TsuguClientError(f"HTTP {response.status}: {payload}")
+            except TsuguClientError:
+                raise
             except Exception as exc:
                 last_error = exc
                 if attempt < self.retries:

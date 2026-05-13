@@ -1,8 +1,20 @@
-# astrbot_plugin_tsugu_bangdream
+<div align="center">
 
-Tsugu BanG Dream! Bot 的 AstrBot 前端适配插件。
+<img src="logo.png" width="256" alt="icon">
 
-本插件只负责 AstrBot 侧的命令、消息、玩家上下文和图片发送；数据查询、图片生成、玩家绑定与车牌数据由 Tsugu 后端提供。
+# Tsugu BanG Dream Bot
+
+[![AstrBot](https://img.shields.io/badge/AstrBot-Plugin-ff69b4?style=for-the-badge)](https://github.com/AstrBotDevs/AstrBot)
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg?style=for-the-badge&color=76bad9)](https://www.python.org/)
+[![Backend](https://img.shields.io/badge/Tsugu-Backend-FFEE88?style=for-the-badge)](https://github.com/Yamamoto-2/tsugu-bangdream-bot)
+
+_✨ BanG Dream! 少女乐团派对多功能查询、玩家绑定、车牌与档线插件，基于 Tsugu 后端为 AstrBot 提供前端适配。 ✨_
+
+
+
+</div>
+
+---
 
 ## 配置
 
@@ -53,3 +65,6 @@ platform_name=red
 - `ycm [关键词]`
 
 服务器可使用 `cn`、`jp`、`tw`、`en`、`kr`，或 `国服`、`日服` 等中文名。
+
+> [!NOTE]
+> 本插件参考 [nonebot-plugin-tsugu-bangdream-bot](https://github.com/WindowsSov8forUs/nonebot-plugin-tsugu-bangdream-bot) 的 Python 前端移植实现，将 Tsugu Bot 的主要前端能力适配到 AstrBot。

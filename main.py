@@ -135,9 +135,13 @@ class TsuguBangDreamPlugin(Star):
     async def _send_response(self, event: AstrMessageEvent, response: Any):
         yield event.chain_result(response_to_chain(response, self.cache_dir))
 
+    def _clean_payload(self, payload: dict[str, Any]) -> dict[str, Any]:
+        # express-validator 的 optional() 不接受 JSON null，所以可选字段必须省略。
+        return {key: value for key, value in payload.items() if value is not None}
+
     async def _call_query(self, path: str, payload: dict[str, Any]):
         payload.setdefault("compress", self.compress)
-        return await self.client.post(path, payload)
+        return await self.client.post(path, self._clean_payload(payload))
 
     async def _get_user(self, event: AstrMessageEvent) -> dict[str, Any]:
         response = await self.client.post(
@@ -358,8 +362,16 @@ class TsuguBangDreamPlugin(Star):
             )
 
         if command == "抽卡模拟":
-            times = int(args[0]) if args else None
-            gacha_id = int(args[1]) if len(args) > 1 else None
+            times = None
+            gacha_id = None
+            if args:
+                if not args[0].isdigit():
+                    return "错误: 抽卡次数必须是数字"
+                times = int(args[0])
+            if len(args) > 1:
+                if not args[1].isdigit():
+                    return "错误: 卡池ID必须是数字"
+                gacha_id = int(args[1])
             return await self._call_query(
                 "/gachaSimulate",
                 {
@@ -426,22 +438,31 @@ class TsuguBangDreamPlugin(Star):
         text = (event.message_str or "").strip()
         if pending["type"] == "bind":
             if not text.isdigit():
-                return "错误: 无效的玩家ID，请直接发送数字玩家ID。"
+                return None
             player_id = int(text)
         else:
             player_id = int(pending["player_id"])
 
-        response = await self.client.post(
-            "/user/bindPlayerVerification",
-            {
-                "platform": self._platform(event),
-                "userId": user_id,
-                "server": int(pending["server"]),
-                "playerId": player_id,
-                "bindingAction": pending["type"],
-            },
-            use_data_backend=True,
-        )
+        try:
+            response = await self.client.post(
+                "/user/bindPlayerVerification",
+                {
+                    "platform": self._platform(event),
+                    "userId": user_id,
+                    "server": int(pending["server"]),
+                    "playerId": player_id,
+                    "bindingAction": pending["type"],
+                },
+                use_data_backend=True,
+            )
+        except TsuguClientError as exc:
+            message = str(exc)
+            self.pending.pop(user_id, None)
+            return message
+        except Exception as exc:
+            self.pending.pop(user_id, None)
+            return f"错误: {exc}"
+
         if response.get("status") == "success":
             self.pending.pop(user_id, None)
             if pending["type"] == "bind":
@@ -454,6 +475,11 @@ class TsuguBangDreamPlugin(Star):
                     },
                 )
             return str(response.get("data", "解除绑定成功"))
+        if response.get("status") == "failed":
+            message = str(response.get("data", "验证失败"))
+            if "请先请求验证码" in message or "验证码" in message:
+                self.pending.pop(user_id, None)
+            return message
         return str(response.get("data", "验证失败"))
 
     async def _forward_room_if_needed(self, event: AstrMessageEvent):
