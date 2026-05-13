@@ -18,13 +18,19 @@ _✨ BanG Dream! 少女乐团派对多功能查询、玩家绑定、车牌与档
 
 ## 配置
 
-后端部署在 Linux 服务器并监听 `9999` 时，将 `backend_url` 配置为：
+默认使用 Tsugu 公共后端：
 
 ```text
-http://你的服务器IP:9999
+http://tsugubot.com:8080
 ```
 
-如果 `data_backend_url` 留空，会复用 `backend_url`。玩家绑定和车牌功能要求后端启用：
+如需使用自建 Tsugu 后端，可将 `backend_url` 改为你的服务器地址，例如：
+
+```text
+http://你的服务器IP:端口号
+```
+
+如果 `data_backend_url` 留空，会复用 `backend_url`。使用自建后端时，玩家绑定和车牌功能要求后端启用：
 
 ```env
 LOCAL_DB=true

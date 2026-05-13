@@ -68,7 +68,7 @@ class TsuguBangDreamPlugin(Star):
         self.config = config
 
         self.backend_url = str(
-            config.get("backend_url", "http://127.0.0.1:9999") or ""
+            config.get("backend_url", "http://tsugubot.com:8080") or ""
         ).rstrip("/")
         self.data_backend_url = str(config.get("data_backend_url", "") or "").rstrip(
             "/"

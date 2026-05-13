@@ -2,14 +2,14 @@
   "backend_url": {
     "description": "Tsugu 后端地址",
     "type": "string",
-    "default": "http://127.0.0.1:9999",
-    "hint": "例如 http://你的服务器IP:9999"
+    "default": "http://tsugubot.com:8080",
+    "hint": "默认使用 Tsugu 公共后端；自建后端可填写 http://你的服务器IP:端口号"
   },
   "data_backend_url": {
     "description": "用户数据/车牌后端地址",
     "type": "string",
     "default": "",
-    "hint": "留空则使用 backend_url；自建后端 LOCAL_DB=true 时通常留空即可"
+    "hint": "留空则使用 backend_url；公共后端和自建后端通常都可留空"
   },
   "platform_name": {
     "description": "发送给 Tsugu 用户数据 API 的平台名",
