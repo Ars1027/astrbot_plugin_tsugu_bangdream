@@ -1,0 +1,58 @@
+{
+  "backend_url": {
+    "description": "Tsugu 后端地址",
+    "type": "string",
+    "default": "http://127.0.0.1:9999",
+    "hint": "例如 http://你的服务器IP:9999"
+  },
+  "data_backend_url": {
+    "description": "用户数据/车牌后端地址",
+    "type": "string",
+    "default": "",
+    "hint": "留空则使用 backend_url；自建后端 LOCAL_DB=true 时通常留空即可"
+  },
+  "platform_name": {
+    "description": "发送给 Tsugu 用户数据 API 的平台名",
+    "type": "string",
+    "default": "red",
+    "hint": "QQ/NapCat/OneBot 生态建议使用 red，以兼容 Tsugu 历史绑定数据"
+  },
+  "use_easy_bg": {
+    "description": "使用简易背景",
+    "type": "bool",
+    "default": false,
+    "hint": "开启后图片生成更快，画面效果可能略简化"
+  },
+  "compress": {
+    "description": "压缩后端返回图片",
+    "type": "bool",
+    "default": true
+  },
+  "auto_forward_room": {
+    "description": "自动识别并转发车牌",
+    "type": "bool",
+    "default": true
+  },
+  "bandori_station_token": {
+    "description": "BandoriStation Token",
+    "type": "string",
+    "default": "",
+    "hint": "留空则使用 Tsugu 默认车牌逻辑"
+  },
+  "timeout": {
+    "description": "后端请求超时时间（秒）",
+    "type": "int",
+    "default": 30
+  },
+  "retries": {
+    "description": "后端请求重试次数",
+    "type": "int",
+    "default": 2
+  },
+  "proxy": {
+    "description": "访问后端使用的代理",
+    "type": "string",
+    "default": "",
+    "hint": "例如 http://127.0.0.1:7890；通常自建后端不需要"
+  }
+}

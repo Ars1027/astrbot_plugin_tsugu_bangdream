@@ -1,0 +1,7 @@
+name: "astrbot_plugin_tsugu_bangdream"
+display_name: "Tsugu BanG Dream Bot"
+desc: "Tsugu BanG Dream! Bot 的 AstrBot 前端适配插件，支持查询、玩家绑定、车牌与档线功能"
+version: "v0.1.0"
+author: "Codex"
+repo: ""
+astrbot_version: ">=4.16.0"
