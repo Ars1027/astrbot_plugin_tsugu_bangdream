@@ -17,6 +17,18 @@
     "default": "red",
     "hint": "QQ/NapCat/OneBot 生态建议使用 red，以兼容 Tsugu 历史绑定数据"
   },
+  "group_whitelist": {
+    "description": "QQ群聊白名单（留空则所有群聊可用）",
+    "type": "list",
+    "default": [],
+    "hint": "填写允许使用本插件的 QQ 群号"
+  },
+  "private_whitelist": {
+    "description": "QQ私聊白名单（留空则所有私聊可用）",
+    "type": "list",
+    "default": [],
+    "hint": "填写允许私聊使用本插件的用户 QQ 号"
+  },
   "use_easy_bg": {
     "description": "使用简易背景",
     "type": "bool",

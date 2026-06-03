@@ -60,7 +60,7 @@ QUERY_COMMANDS = {
     "astrbot_plugin_tsugu_bangdream",
     "Codex",
     "Tsugu BanG Dream! Bot 的 AstrBot 前端适配插件",
-    "v0.1.0",
+    "v0.1.1",
 )
 class TsuguBangDreamPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
@@ -83,6 +83,12 @@ class TsuguBangDreamPlugin(Star):
         ).strip()
         self.auto_forward_room = bool(config.get("auto_forward_room", True))
         self.platform_name = str(config.get("platform_name", "red") or "red").strip()
+        self.group_whitelist = self._normalize_whitelist(
+            config.get("group_whitelist", [])
+        )
+        self.private_whitelist = self._normalize_whitelist(
+            config.get("private_whitelist", [])
+        )
 
         self.client = TsuguClient(
             self.backend_url,
@@ -124,6 +130,24 @@ class TsuguBangDreamPlugin(Star):
             return str(event.get_sender_name())
         except Exception:
             return self._sender_id(event)
+
+    @staticmethod
+    def _normalize_whitelist(values: Any) -> set[str]:
+        if not values:
+            return set()
+        if isinstance(values, (str, int)):
+            values = [values]
+        return {str(value).strip() for value in values if str(value).strip()}
+
+    def _is_allowed(self, event: AstrMessageEvent) -> bool:
+        try:
+            group_id = event.get_group_id()
+        except Exception:
+            group_id = None
+        if group_id:
+            return not self.group_whitelist or str(group_id) in self.group_whitelist
+        sender_id = self._sender_id(event)
+        return not self.private_whitelist or sender_id in self.private_whitelist
 
     def _platform(self, event: AstrMessageEvent) -> str:
         # Tsugu 历史上 QQ/OneBot 生态常映射到 red；这里默认 red，可在配置中覆盖。
@@ -384,6 +408,8 @@ class TsuguBangDreamPlugin(Star):
         return "暂不支持该指令"
 
     async def _run_query(self, event: AstrMessageEvent, command: str, arg_text: str):
+        if not self._is_allowed(event):
+            return
         event.stop_event()
         try:
             response = await self._handle_query_command(event, command, arg_text)
@@ -512,6 +538,8 @@ class TsuguBangDreamPlugin(Star):
 
     @filter.event_message_type(filter.EventMessageType.ALL)
     async def on_any_message(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         pending_response = await self._finish_pending(event)
         if pending_response is not None:
             event.stop_event()
@@ -522,16 +550,22 @@ class TsuguBangDreamPlugin(Star):
 
     @filter.command("开启车牌转发")
     async def open_forward(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         event.stop_event()
         yield event.plain_result(await self._change_user(event, {"shareRoomNumber": True}))
 
     @filter.command("关闭车牌转发")
     async def close_forward(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         event.stop_event()
         yield event.plain_result(await self._change_user(event, {"shareRoomNumber": False}))
 
     @filter.command("绑定玩家")
     async def bind_player(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         event.stop_event()
         try:
             args = split_args(self._args(event, "绑定玩家"))
@@ -541,6 +575,8 @@ class TsuguBangDreamPlugin(Star):
 
     @filter.command("解除绑定", alias={"解绑玩家"})
     async def unbind_player(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         event.stop_event()
         try:
             args = split_args(self._args(event, "解除绑定", "解绑玩家"))
@@ -550,6 +586,8 @@ class TsuguBangDreamPlugin(Star):
 
     @filter.command("主服务器", alias={"服务器模式", "切换服务器"})
     async def main_server(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         event.stop_event()
         args = split_args(self._args(event, "主服务器", "服务器模式", "切换服务器"))
         if not args:
@@ -564,6 +602,8 @@ class TsuguBangDreamPlugin(Star):
 
     @filter.command("设置显示服务器", alias={"默认服务器", "设置默认服务器"})
     async def display_servers(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         event.stop_event()
         args = split_args(self._args(event, "设置显示服务器", "默认服务器", "设置默认服务器"))
         if not args:
@@ -584,6 +624,8 @@ class TsuguBangDreamPlugin(Star):
 
     @filter.command("玩家状态")
     async def player_status(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         args = split_args(self._args(event, "玩家状态"))
         try:
             index = int(args[0]) if args and args[0].isdigit() else None
@@ -601,6 +643,8 @@ class TsuguBangDreamPlugin(Star):
 
     @filter.command("玩家状态列表", alias={"玩家列表", "玩家信息列表"})
     async def player_list(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         event.stop_event()
         try:
             user = await self._get_user(event)
@@ -625,6 +669,8 @@ class TsuguBangDreamPlugin(Star):
 
     @filter.command("玩家默认ID", alias={"默认玩家ID", "默认玩家", "玩家ID"})
     async def switch_player_index(self, event: AstrMessageEvent):
+        if not self._is_allowed(event):
+            return
         event.stop_event()
         args = split_args(self._args(event, "玩家默认ID", "默认玩家ID", "默认玩家", "玩家ID"))
         if not args or not args[0].isdigit():
